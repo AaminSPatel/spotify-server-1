@@ -23,11 +23,16 @@ app.use(cors({
 const PORT = 7000;
 
 connectDB();
+//import express from 'express'; // ES module syntax
+//const app = express();
 
- app.get('/api/',(req,res)=>{
-   res.send('Hello World')
-   // db.spotify.songs.find({})
- })
+// Routes
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
+export default app; // ES module syntax
+
 app.use('/api/songs',songRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/played',playedSongRoutes);
