@@ -9,7 +9,7 @@
     "dev": "node api/server.js"
   },
   "engines": {
-  "node": "16.x"
+  "node": "20.x"
 },
   "author": "aamin patel",
   "license": "ISC",
