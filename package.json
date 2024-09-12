@@ -2,7 +2,7 @@
   "name": "spotify",
   "version": "1.0.0",
   "description": "creating spotify clone",
-  "main": "index.js",
+  "main": "api/server.js",
   "type": "module",
   "scripts": {
     "start": "nodemon api/server.js",
