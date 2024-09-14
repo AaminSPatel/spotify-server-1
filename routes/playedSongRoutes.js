@@ -15,10 +15,11 @@ router.get('/', async (req, res) => {
 });
 
 // POST /playedsongs - Add a new played song
-router.post('/', async (req, res) => {
-  const { name, song_key, song_path, song_img, artist, category } = req.body;
-  const newPlayedSong = new PlayedSong({ name, song_key, song_path, song_img, artist, category });
-
+router.post('/add', async (req, res) => {
+  const { name, song_key, song_path, song_img, artist, category,userId } = req.body;
+  const newPlayedSong = new PlayedSong({ name, song_key, song_path, song_img, artist, category,createdBy: userId, });
+  //console.log(req.body);
+  
   try {
     const savedSong = await newPlayedSong.save();  // Save the new song to the database
     res.status(201).json(savedSong);  // Send the saved song as a JSON response

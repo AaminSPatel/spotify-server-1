@@ -52,7 +52,6 @@ router.post('/add',async (req,res)=>{
         const newPlaylist = await playlist.save();
         res.status(201).json(newPlaylist);
     } catch(err){
-        console.log(err,'ye ma chuda ra he');
         
         res.status(400).json({message:err.message})
     }

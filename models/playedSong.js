@@ -7,7 +7,9 @@ const playedsongSchema = new mongoose.Schema({
   song_path: { type: String, required: true },       // Path to the song file
   song_img: { type: String, required: true },        // Image path for the song
   artist: { type: String, required: true },          // Name of the artist
-  category: { type: String, required: true },        // Category/Genre of the song
+  category: { type: String, required: true }, 
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Adjust type and ref as needed
+  // Category/Genre of the song
 }, { collection: 'played_song' }); // Optional: Explicitly set collection name
 
 const PlayedSong = mongoose.model('played_song', playedsongSchema);
