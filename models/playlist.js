@@ -5,7 +5,7 @@ const playlistSchema = new mongoose.Schema({
   name: { type: String, required: true },  // Name of the playlist
   description: { type: String, required: false },  // Description of the playlist
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Reference to the User who created the playlist
-  songs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Song',required: false }],  // Array of references to songs
+  songs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Songs',required: false }],  // Array of references to songs
   created_at: { type: Date, default: Date.now },  // Timestamp for when the playlist was created
   updated_at: { type: Date, default: Date.now },  // Timestamp for the last update
 }, { collection: 'playlist' });

@@ -22,6 +22,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+
 // POST /signin - Sign in a user
 router.post('/signin', async (req, res) => {
   const { email, password } = req.body;
@@ -61,6 +62,51 @@ router.post('/signin', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: err.message }); // Send error response if fetching fails
+  }
+});
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+//to verify jswebtoken 
+function authenticateToken(req, res, next) {
+  const token = req.header('Authorization')?.split(' ')[1]; // Extract token from Authorization header
+
+  if (!token) {
+    return res.status(401).json({ message: 'Access Denied. No Token Provided.' });
+  }
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded; // Attach the decoded payload to the request object
+    next(); // Proceed to the next middleware or route
+    
+  } catch (error) {
+    return res.status(403).json({ message: 'Invalid Token.' });
+  }
+}
+router.get('/profile', authenticateToken,async (req, res) => {
+  /* res.json({ message: 'Access Granted to Sign In.', user: req.user }); */
+  //console.log(req.user.email);
+  const {email,userId} = req.user
+  //console.log(email,userId);
+  
+  // to sign in if token is present
+ try{
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+   
+   
+    // Compare the provided password with the stored hashed password
+    /* if(user._id == userId){
+      console.log('Mil gya user');
+      
+    } */
+    res.json({user:user})
+  }
+  catch{
+
   }
 });
 
