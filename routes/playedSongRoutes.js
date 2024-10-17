@@ -4,10 +4,17 @@ import PlayedSong from '../models/playedSong.js';  // Import the PlayedSong mode
 
 const router = express.Router();
 
-// GET /playedsongs - Retrieve all played songs
+
+// GET /playedsongs?userId=<userId> - Retrieve played songs for a specific user
 router.get('/', async (req, res) => {
+  const userId = req.query.userId;  // Get the userId from query params
   try {
-    const playedSongs = await PlayedSong.find();  // Fetch all played songs from the database
+    // Fetch played songs filtered by userId if it exists
+    let query = {};
+    if (userId) {
+      query.createdBy = userId;
+    }
+    const playedSongs = await PlayedSong.find(query);  // Fetch played songs based on the query
     res.json(playedSongs);  // Send the songs as a JSON response
   } catch (err) {
     res.status(500).json({ message: err.message });  // Send error response if fetching fails
@@ -16,8 +23,8 @@ router.get('/', async (req, res) => {
 
 // POST /playedsongs - Add a new played song
 router.post('/add', async (req, res) => {
-  const { name, song_key, song_path, song_img, artist, category,userId } = req.body;
-  const newPlayedSong = new PlayedSong({ name, song_key, song_path, song_img, artist, category,createdBy: userId, });
+  const { name, song_key, song_path, song_img, artist, category,userId,song_id } = req.body;
+  const newPlayedSong = new PlayedSong({ name, song_key, song_path, song_img, artist, category,createdBy: userId,song_id });
   //console.log(req.body);
   
   try {

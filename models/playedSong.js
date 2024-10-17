@@ -8,6 +8,7 @@ const playedsongSchema = new mongoose.Schema({
   song_img: { type: String, required: true },        // Image path for the song
   artist: { type: String, required: true },          // Name of the artist
   category: { type: String, required: true }, 
+  song_id:{type: String, required: true},
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Adjust type and ref as needed
   // Category/Genre of the song
 }, { collection: 'played_song' }); // Optional: Explicitly set collection name

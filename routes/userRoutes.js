@@ -3,14 +3,28 @@ import User from '../models/user.js'; // Import the User model
 import bcrypt from 'bcrypt'; // For password hashing comparison
 import jwt from 'jsonwebtoken'; // For token generation
 import dotenv from 'dotenv'
+import path  from 'path'
+
 dotenv.config();
 const router = express.Router();
-
+import multer from 'multer'
 // Function to hash password using bcrypt
 async function hashPassword(plainPassword) {
   const saltRounds = 10; // Determines the cost factor for hashing
   return await bcrypt.hash(plainPassword, saltRounds);
 }
+
+// Set up storage for uploaded images
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "api/public/"); // Directory to save the uploaded images
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Rename the file
+  },
+});
+
+const upload = multer({ storage: storage });
 
 // GET /users - Retrieve all users
 router.get('/', async (req, res) => {
@@ -31,20 +45,20 @@ router.post('/signin', async (req, res) => {
     // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User not found,try another email' });
     }
 
     // Compare the provided password with the stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Wrong Password' });
     }
 
     // Generate a JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET || 'your_jwt_secret', // Use an environment variable for the secret in production
-      { expiresIn: '1h' } // Token expiry time
+      { expiresIn: '24h' } // Token expiry time
     );
 
     // Send back the user information (excluding the password) and token
@@ -139,20 +153,36 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// PUT /users/:id - Update an existing user by ID
-router.put('/:id', async (req, res) => {
+
+router.put('/:id', upload.single('image'), async (req, res) => {
   const { id } = req.params;
-  const { email, password, mobile, full_name, profile_pic } = req.body;
+  const { mobile, full_name } = req.body;
+
+  // Check if file is uploaded
+  const profilePicPath = req.file ? req.file.path : undefined;
+
+  //console.log(req.body,profilePicPath);
 
   try {
+    // Find and update only the specific fields
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { email, password, mobile, full_name, profile_pic },
-      { new: true }
+      {
+        mobile,
+        full_name,
+        ...(profilePicPath && { profile_pic: profilePicPath }), // Update profile_pic only if file is uploaded
+      },
+      { new: true } // Return the updated document
     );
-    res.json(updatedUser); // Send the updated user as a JSON response
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    console.log(updatedUser);
+    
+    res.json(updatedUser); // Send the updated user details
   } catch (err) {
-    res.status(400).json({ message: err.message }); // Send error response if updating fails
+    res.status(400).json({ message: err.message }); // Handle error
   }
 });
 
